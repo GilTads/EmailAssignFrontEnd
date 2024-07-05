@@ -1,11 +1,14 @@
 <template>
   <q-layout>
-    <q-page>
-      <div v-if="user">
-        <h2>Bem-vindo, <b>{{ user.cn }}</b></h2>
-        <p>Email: <b>{{ user.mail }}</b></p>
-        <p>Departamento: <b>{{ user.department }}</b></p>
-        <p>Telefone: <b>{{ user.telephoneNumber }}</b></p>
+    <q-page class=" flex justify-center">
+      <div v-if="user" class="form-container">
+        <div class="user-font">
+          <h2>Bem-vindo, <b>{{ user.cn }}</b></h2>
+          <p>Email: <b class="text-primary">{{ user.mail }}</b></p>
+          <p>Departamento: <b class="text-primary">{{ user.department }}</b></p>
+          <p>Telefone: <b class="text-primary">{{ user.telephoneNumber }}</b></p>
+          <p>Celular: <b class="text-primary">{{ user.mobile }}</b></p>
+        </div>
       </div>
       <div v-else>
         <p>Carregando...</p>
@@ -42,3 +45,14 @@ export default {
   }
 }
 </script>
+
+<style>
+ @font-face {
+  font-family: arial-unicode-ms;
+  src: url('../assets/font/arial-unicode-ms.ttf');
+ }
+
+ .user-font {
+  font-family: 'arial-unicode-ms';
+ }
+</style>

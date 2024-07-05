@@ -59,7 +59,7 @@ export default {
         router.push('home')
       } catch (error) {
         if (error.response) {
-          if (error.response.status === 403) {
+          if (error.response.status === 401) {
             $q.notify({
               type: 'negative',
               message: 'Credenciais Inválidas',
@@ -101,16 +101,11 @@ html {
   /* Desabilita a rolagem da página */
 }
 
-.q-page {
-  height: 100vh;
-}
-
 .form-container {
-  margin-top: -15%;
-  width: 90%;
+  margin-top: -50px;
+  width: 100%;
   max-width: 600px;
   /* Define um tamanho máximo */
-  padding: 20px;
   box-sizing: border-box;
 }
 
