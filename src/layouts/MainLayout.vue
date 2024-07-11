@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" no-scroll>
-    <q-header elevated>
+    <q-header elevated reveal>
       <q-toolbar>
         <q-toolbar-title>
           Assinatura Eletrônica SH
