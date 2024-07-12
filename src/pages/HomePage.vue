@@ -3,11 +3,11 @@
     <q-page class="flex justify-center">
       <div v-if="user" class="container">
         <div class="user-font">
-          <h3>Olá, <b>{{ user.cn }}</b></h3>
+          <h3 class="text-secondary">Olá, <b class="text-primary">{{ user.cn }}</b></h3>
         </div>
         <q-card v-if="!emailAssignature">
           <q-card-section>
-            <div class="text-h6 flex justify-start">
+            <div class="text-h6 text-primary flex flex-left">
               Insira as informações abaixo:
             </div>
           </q-card-section>
@@ -16,45 +16,28 @@
               <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
                 <div class="row">
                   <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                    <q-input
-                      filled
-                      type="text"
-                      v-model="ramal"
-                      label="Digite seu Ramal"
-                      hint="Ex. 501"
-                      lazy-rules
-                      mask="###"
-                      max-lenght="3"
-                      :rules="[ val => val && val.length == 3 || 'Informe os três dígitos do ramal']"
-                    />
+                    <q-input filled type="text" v-model="ramal" label="Digite seu Ramal" hint="Ex. 501 ou 8909" lazy-rules
+                      mask="####" max-lenght="4"
+                      :rules="[val => val && val.length == 3 || val && val.length == 4  || 'Informe os três dígitos do ramal']" />
                   </div>
                   <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                    <q-input
-                      v-if="accept"
-                      filled
-                      type="text"
-                      v-model="celular"
-                      label="Celular Corporativo"
-                      lazy-rules
-                      mask="(##)#####-####"
-                      hint="Somente números"
-                      max-lenght="14"
-                      :rules="[ val => val && val !== '' && val.length == 14  || 'Campo Obrigatório']"
-                    />
+                    <q-input v-if="accept" filled type="text" v-model="celular" label="Celular Corporativo" lazy-rules
+                      mask="(##)#####-####" hint="Somente números" max-lenght="14"
+                      :rules="[val => val && val !== '' && val.length == 14 || 'Campo Obrigatório']" />
                   </div>
-              </div>
+                </div>
                 <div class="text-h6 flex justify-start">
                   <q-toggle color="secondary" v-model="accept" label="Possui celular corporativo" />
                 </div>
                 <div>
-                  <q-btn label="Gerar" type="submit" color="secondary"/>
+                  <q-btn label="Gerar" type="submit" color="secondary" />
                 </div>
               </q-form>
             </div>
           </q-card-section>
         </q-card>
         <q-separator vertical inset></q-separator>
-        <q-card v-if="emailAssignature" >
+        <q-card v-if="emailAssignature">
           <div class="signature-div" ref="signatureDiv">
             <q-card-section>
               <q-list class="text-primary">
@@ -71,7 +54,7 @@
                   </q-item-section>
                 </q-item>
               </q-list>
-              <q-img :src="url"/>
+              <q-img :src="url" />
             </q-card-section>
           </div>
         </q-card>
@@ -80,7 +63,7 @@
           <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
         </div>
       </div>
-      <q-separator ></q-separator>
+      <q-separator></q-separator>
     </q-page>
   </q-layout>
 
@@ -88,19 +71,21 @@
 
 <script>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { LocalStorage } from 'quasar'
+import { LocalStorage, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import html2canvas from 'html2canvas'
+import { write } from 'clipboard-polyfill'
 
 export default {
   setup () {
+    const $q = useQuasar()
     const user = ref(null)
     const router = useRouter()
     const ramal = ref(null)
     const accept = ref(false)
     const celular = ref(null)
     const emailAssignature = ref(false)
-    const url = ref('../src/assets/santahelena.png')
+    const url = ref('../src/assets/tarja.png')
     const signatureDiv = ref(null)
 
     const captureSignature = async () => {
@@ -108,6 +93,7 @@ export default {
         const canvas = await html2canvas(signatureDiv.value)
         const imgData = canvas.toDataURL('image/png')
         downloadImage(imgData, 'assinaturaEletronicaSH.png')
+        copyToClipboard(canvas)
       }
     }
     const downloadImage = (data, filename) => {
@@ -115,6 +101,32 @@ export default {
       link.href = data
       link.download = filename
       link.click()
+    }
+
+    const copyToClipboard = async (canvas) => {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+        await write([new ClipboardItem({ 'image/png': blob })])
+        $q.notify({
+          type: 'positive',
+          message: 'Assinatura Eletrônica copiada para a área de transferência.',
+          timeout: 6000,
+          icon: 'expand_circle_down'
+        })
+        $q.notify({
+          type: 'positive',
+          message: 'Download realizado com sucesso.',
+          timeout: 6000,
+          icon: 'expand_circle_down'
+        })
+      } catch (err) {
+        $q.notify({
+          type: 'negative',
+          timeout: 6000,
+          message: 'Erro ao copiar assinatura. Tente novamente',
+          icon: 'error'
+        })
+      }
     }
 
     watch(accept, (newVal) => {
@@ -160,29 +172,30 @@ export default {
 </script>
 
 <style>
- @font-face {
+@font-face {
   font-family: arial-unicode-ms;
   src: url('../assets/font/arial-unicode-ms.ttf');
- }
+}
 
- .user-font {
+.user-font {
   font-family: 'arial-unicode-ms';
- }
+}
 
- .container {
+.container {
   max-width: 900px;
   width: 100%;
   height: auto
- }
- .name{
+}
+
+.name {
   font-size: 25px
- }
+}
 
- .user-data {
-  font-size: 15px;
- }
+.user-data {
+  font-size: 20px;
+}
 
- .info {
+.info {
   margin-left: -20px
- }
+}
 </style>

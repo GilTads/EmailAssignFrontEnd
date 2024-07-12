@@ -7,6 +7,11 @@
         </div>
         <q-card class="form-card">
           <q-card-section>
+            <div class="text-h6 text-primary flex flex-left">
+              Insira suas credenciais de rede
+            </div>
+          </q-card-section>
+          <q-card-section>
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
               <q-input filled v-model="username" label="Usuário *" hint="Ex. Joao.Silva" lazy-rules
                 :rules="[val => val && val.length > 0 || 'Campo Obrigatório']" />

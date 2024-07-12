@@ -2,16 +2,13 @@
   <q-layout view="hHh lpR fFf" no-scroll>
     <q-header elevated reveal>
       <q-toolbar>
-        <q-toolbar-title>
-          Assinatura Eletrônica SH
-        </q-toolbar-title>
-
         <div>
-          <img
-            alt="SH logo"
-            src="~assets/sh_toolbar.jpg"
-            style="width: 70px; height: 70px; margin-bottom: -5px; margin-right: -10px"
-    >
+          <img alt="SH logo" src="~assets/sh_toolbar.jpg"
+            style="width: 70px; height: 70px; margin-bottom: -5px; margin-left: -10px;" />
+        </div>
+        <q-toolbar-title> Gerador de Assinatura Eletrônica SH </q-toolbar-title>
+        <div v-if="user" class=" float-right">
+          <q-btn icon="logout" @click="logoff" label="Sair" color="red" push size="lg"/>
         </div>
       </q-toolbar>
     </q-header>
@@ -22,10 +19,30 @@
   </q-layout>
 </template>
 
-<script setup>
+<script>
 
-defineOptions({
-  name: 'MainLayout'
-})
+import { onUpdated, ref } from 'vue'
+import { LocalStorage } from 'quasar'
+import { useRouter } from 'vue-router'
 
+export default {
+
+  setup () {
+    const user = ref(null)
+    const router = useRouter()
+
+    onUpdated(() => {
+      const storedData = LocalStorage.getItem('user')
+      user.value = storedData
+    })
+
+    return {
+      user,
+      logoff () {
+        LocalStorage.clear()
+        router.push({ name: 'login' })
+      }
+    }
+  }
+}
 </script>
