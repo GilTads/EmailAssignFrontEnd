@@ -107,7 +107,7 @@ export default {
       if (signatureDiv.value) {
         const canvas = await html2canvas(signatureDiv.value)
         const imgData = canvas.toDataURL('image/png')
-        downloadImage(imgData, 'signature.png')
+        downloadImage(imgData, 'assinaturaEletronicaSH.png')
       }
     }
     const downloadImage = (data, filename) => {
