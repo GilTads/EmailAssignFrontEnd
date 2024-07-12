@@ -1,5 +1,5 @@
 <template>
-  <q-layout>
+  <q-layout no-scroll>
     <q-page class=" flex flex-center">
       <div class="form-container">
         <div class="row justify-center">

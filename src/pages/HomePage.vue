@@ -1,70 +1,96 @@
 <template>
   <q-layout class="user-font">
-    <q-page class=" flex justify-center">
-      <div v-if="user" class="form-container">
+    <q-page class="flex justify-center">
+      <div v-if="user" class="container">
         <div class="user-font">
-          <h3>Bem-vindo, <b>{{ user.cn }}</b></h3>
-          <!-- <p>Email: <b class="text-primary">{{ user.mail }}</b></p>
-          <p>Departamento: <b class="text-primary">{{ user.department }}</b></p>
-          <p>Telefone: <b class="text-primary">{{ user.telephoneNumber }}</b></p>
-          <p>Celular: <b class="text-primary">{{ user.mobile }}</b></p> -->
+          <h3>Olá, <b>{{ user.cn }}</b></h3>
         </div>
-        <q-card>
+        <q-card v-if="!emailAssignature">
           <q-card-section>
             <div class="text-h6 flex justify-start">
               Insira as informações abaixo:
             </div>
           </q-card-section>
           <q-card-section>
-            <div class="q-pa-md flex justify-start">
-              <q-form class="q-gutter-md">
-                <q-input
-                  filled
-                  type="text"
-                  v-model="ramal"
-                  label="Digite seu Ramal"
-                  hint="Ex. 501"
-                  lazy-rules
-                  mask="###"
-                  max-lenght="3"
-                  :rules="[ val => val && val.length > 0  || 'Campo Obrigatório']"
-                />
+            <div class="q-pa-md">
+              <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
+                <div class="row">
+                  <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
+                    <q-input
+                      filled
+                      type="text"
+                      v-model="ramal"
+                      label="Digite seu Ramal"
+                      hint="Ex. 501"
+                      lazy-rules
+                      mask="###"
+                      max-lenght="3"
+                      :rules="[ val => val && val.length == 3 || 'Informe os três dígitos do ramal']"
+                    />
+                  </div>
+                  <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
+                    <q-input
+                      v-if="accept"
+                      filled
+                      type="text"
+                      v-model="celular"
+                      label="Celular Corporativo"
+                      lazy-rules
+                      mask="(##)#####-####"
+                      hint="Somente números"
+                      max-lenght="14"
+                      :rules="[ val => val && val !== '' && val.length == 14  || 'Campo Obrigatório']"
+                    />
+                  </div>
+              </div>
                 <div class="text-h6 flex justify-start">
                   <q-toggle color="secondary" v-model="accept" label="Possui celular corporativo" />
                 </div>
-                <q-input
-                  v-if="accept"
-                  filled
-                  type="text"
-                  v-model="celular"
-                  label="Celular Corporativo"
-                  lazy-rules
-                  mask="(##)#####-####"
-                  hint="Ex.(99)99999-9999"
-                  max-lenght="14"
-                  :rules="[ val !== null && val !== ''  || 'Campo Obrigatório']"
-                />
                 <div>
                   <q-btn label="Gerar" type="submit" color="secondary"/>
-                  <q-btn label="Limpar" type="reset" color="primary" flat class="q-ml-sm" />
                 </div>
               </q-form>
             </div>
           </q-card-section>
         </q-card>
+        <q-separator vertical inset></q-separator>
+        <q-card v-if="emailAssignature" >
+          <div class="signature-div" ref="signatureDiv">
+            <q-card-section>
+              <q-list class="text-primary">
+                <q-item class="info">
+                  <q-item-section v-if="celular">
+                    <span class="name"><b>{{ user.cn }}</b></span>
+                    <span class="user-data">{{ user.department }}</span>
+                    <span class="user-data">(67)3441-0500 Ramal {{ ramal }} / {{ celular }}</span>
+                  </q-item-section>
+                  <q-item-section v-if="!celular">
+                    <span class="name"><b>{{ user.cn }}</b></span>
+                    <span class="user-data">{{ user.department }}</span>
+                    <span class="user-data">(67)3441-0500 Ramal {{ ramal }}</span>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <q-img :src="url"/>
+            </q-card-section>
+          </div>
+        </q-card>
+        <div class="q-mt-md" v-if="emailAssignature">
+          <q-btn icon="save" label="Salvar" @click="captureSignature" color="primary" push class="q-ml-sm" />
+          <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
+        </div>
       </div>
-      <div v-else>
-        <p>Carregando...</p>
-      </div>
+      <q-separator ></q-separator>
     </q-page>
   </q-layout>
 
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { LocalStorage } from 'quasar'
 import { useRouter } from 'vue-router'
+import html2canvas from 'html2canvas'
 
 export default {
   setup () {
@@ -72,6 +98,30 @@ export default {
     const router = useRouter()
     const ramal = ref(null)
     const accept = ref(false)
+    const celular = ref(null)
+    const emailAssignature = ref(false)
+    const url = ref('../src/assets/santahelena.png')
+    const signatureDiv = ref(null)
+
+    const captureSignature = async () => {
+      if (signatureDiv.value) {
+        const canvas = await html2canvas(signatureDiv.value)
+        const imgData = canvas.toDataURL('image/png')
+        downloadImage(imgData, 'signature.png')
+      }
+    }
+    const downloadImage = (data, filename) => {
+      const link = document.createElement('a')
+      link.href = data
+      link.download = filename
+      link.click()
+    }
+
+    watch(accept, (newVal) => {
+      if (!newVal) {
+        celular.value = null
+      }
+    })
 
     onMounted(() => {
       const storedData = LocalStorage.getItem('user')
@@ -84,13 +134,26 @@ export default {
       }
     })
     onUnmounted(() => {
-      // LocalStorage.clear()
+      LocalStorage.clear()
     })
 
     return {
       user,
       ramal,
-      accept
+      celular,
+      accept,
+      url,
+      emailAssignature,
+      captureSignature,
+      signatureDiv,
+      onSubmit () {
+        emailAssignature.value = true
+      },
+      voltar () {
+        emailAssignature.value = false
+        ramal.value = null
+        celular.value = null
+      }
     }
   }
 }
@@ -105,6 +168,23 @@ export default {
  .user-font {
   font-family: 'arial-unicode-ms';
  }
+
+ .container {
+  max-width: 900px;
+  width: 100%;
+  height: auto
+ }
+ .name{
+  font-size: 25px
+ }
+
+ .user-data {
+  font-size: 15px;
+ }
+
+ .info {
+  margin-left: -20px
+ }
 </style>
 
 <!--
@@ -112,35 +192,44 @@ export default {
 <template>
   <q-page>
     <div ref="signatureDiv" class="signature-div">
-      // Conteúdo da assinatura
+       Conteúdo da assinatura
     </div>
     <q-btn @click="captureSignature" label="Capturar Assinatura" />
   </q-page>
 </template>
 
 <script>
+import { ref } from 'vue';
 import html2canvas from 'html2canvas';
 
 export default {
-  methods: {
-    captureSignature() {
-      const signatureDiv = this.$refs.signatureDiv;
-      html2canvas(signatureDiv).then(canvas => {
+  setup() {
+    const signatureDiv = ref(null);
+
+    const captureSignature = async () => {
+      if (signatureDiv.value) {
+        const canvas = await html2canvas(signatureDiv.value);
         const imgData = canvas.toDataURL('image/png');
-        this.downloadImage(imgData, 'signature.png');
-      });
-    },
-    downloadImage(data, filename) {
+        downloadImage(imgData, 'signature.png');
+      }
+    };
+
+    const downloadImage = (data, filename) => {
       const link = document.createElement('a');
       link.href = data;
       link.download = filename;
       link.click();
-    }
+    };
+
+    return {
+      signatureDiv,
+      captureSignature
+    };
   }
-}
+};
 </script>
 
-<style>
+<style scoped>
 .signature-div {
    Estilos para a div da assinatura
 }
