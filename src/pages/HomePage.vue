@@ -1,9 +1,9 @@
 <template>
   <q-layout class="user-font">
-    <q-page class="flex justify-center">
+    <q-page class="flex flex-column justify-center">
       <div v-if="user" class="container">
-        <div class="user-font">
-          <h3 class="text-secondary">Olá, <b class="text-primary">{{ user.cn }}</b></h3>
+        <div>
+          <h3 class="text-white">Olá, <b>{{ user.cn }}</b></h3>
         </div>
         <q-card v-if="!emailAssignature">
           <q-card-section>
@@ -62,6 +62,21 @@
           <q-btn icon="save" label="Salvar" @click="captureSignature" color="primary" push class="q-ml-sm" />
           <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
         </div>
+        <div class="flex justify-center q-mt-lg">
+          <div class="q-pa-md">
+            <q-btn icon="help" label="Tutorial" @click="toggleHelp" color="primary" push class="q-ma-sm" />
+          </div>
+          <div ref="videoContainer">
+            <q-card class="q-mt-lg" v-if="help">
+              <video controls width="900">
+                <source src="../assets/videos/video.mp4">
+              </video>
+              <q-card-section class="q-mb-lg text-h6 text-secondary flex flex-center">
+                Siga as instruções do vídeo e altere facilmente sua assinatura digital.
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
       </div>
       <q-separator></q-separator>
     </q-page>
@@ -77,6 +92,7 @@ import html2canvas from 'html2canvas'
 import { write } from 'clipboard-polyfill'
 
 export default {
+
   setup () {
     const $q = useQuasar()
     const user = ref(null)
@@ -87,6 +103,8 @@ export default {
     const emailAssignature = ref(false)
     const url = ref('../src/assets/tarja.png')
     const signatureDiv = ref(null)
+    const help = ref(false)
+    const videoContainer = ref(null)
 
     const captureSignature = async () => {
       if (signatureDiv.value) {
@@ -129,6 +147,21 @@ export default {
       }
     }
 
+    const toggleHelp = () => {
+      help.value = !help.value
+      if (help.value) {
+        setTimeout(() => {
+          scrollToVideo()
+        }, 100)
+      }
+    }
+
+    const scrollToVideo = () => {
+      if (videoContainer.value) {
+        videoContainer.value.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+
     watch(accept, (newVal) => {
       if (!newVal) {
         celular.value = null
@@ -158,6 +191,9 @@ export default {
       emailAssignature,
       captureSignature,
       signatureDiv,
+      toggleHelp,
+      help,
+      videoContainer,
       onSubmit () {
         emailAssignature.value = true
       },
@@ -172,6 +208,7 @@ export default {
 </script>
 
 <style>
+
 @font-face {
   font-family: arial-unicode-ms;
   src: url('../assets/font/arial-unicode-ms.ttf');

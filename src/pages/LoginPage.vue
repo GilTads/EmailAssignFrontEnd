@@ -1,10 +1,7 @@
 <template>
-  <q-layout no-scroll>
+  <q-layout>
     <q-page class=" flex flex-center">
       <div class="form-container">
-        <div class="row justify-center">
-          <h5 class="text-h5 text-secondary q-my-md">Gerador de Assinatura</h5>
-        </div>
         <q-card class="form-card">
           <q-card-section>
             <div class="text-h6 text-primary flex flex-left">
@@ -100,11 +97,6 @@ export default {
 </script>
 
 <style>
-body,
-html {
-  overflow: hidden;
-  /* Desabilita a rolagem da página */
-}
 
 .form-container {
   margin-top: -50px;
@@ -112,10 +104,5 @@ html {
   max-width: 600px;
   /* Define um tamanho máximo */
   box-sizing: border-box;
-}
-
-.form-card {
-  width: 100%;
-  /* O card ocupa toda a largura do contêiner */
 }
 </style>
