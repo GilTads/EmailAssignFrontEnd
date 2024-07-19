@@ -41,7 +41,6 @@ export default {
     const password = ref(null)
 
     const onSubmit = async () => {
-      console.log('Submit')
       $q.loading.show({
         spinnerColor: 'secondary',
         message: 'Conectando ao servidor...',
@@ -53,7 +52,6 @@ export default {
           username: username.value,
           password: password.value
         }
-        console.log(data)
         await Services.login(data)
         // Redireciona para a página inicial
         router.push('home')
