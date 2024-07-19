@@ -1,1 +1,16 @@
 /* app global css */
+html {
+  overflow-y: auto; /* Habilita o scroll vertical apenas quando necessário */
+}
+
+body {
+  overflow-y: auto; /* Habilita o scroll vertical apenas quando necessário */
+  overflow-x: hidden; /* Oculta o scroll horizontal */
+}
+
+@font-face {
+  font-family: arial-unicode-ms;
+  src: url('../assets/font/arial-unicode-ms.ttf');
+}
+
+

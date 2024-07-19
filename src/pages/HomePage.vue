@@ -1,13 +1,12 @@
 <template>
-  <q-layout class="user-font">
-    <q-page class="flex flex-column justify-center">
+    <q-page class="flex flex-column justify-center q-ml-md">
       <div v-if="user" class="container">
         <div>
-          <h3 class="text-white">Olá, <b>{{ user.cn }}</b></h3>
+          <h3 class="text-secondary">Olá, <b class="text-primary">{{ user.cn }}</b></h3>
         </div>
-        <q-card v-if="!emailAssignature">
+        <q-card v-if="!emailAssignature" class="card text-primary">
           <q-card-section>
-            <div class="text-h6 text-primary flex flex-left">
+            <div class="text-h5 text-primary flex flex-left">
               Insira as informações abaixo:
             </div>
           </q-card-section>
@@ -16,12 +15,12 @@
               <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
                 <div class="row">
                   <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                    <q-input filled type="text" v-model="ramal" label="Digite seu Ramal" hint="Ex. 501 ou 8909" lazy-rules
+                    <q-input filled bg-color="teal-2" label-color="black" v-model="ramal" label="Digite seu Ramal" hint="Ex. 501 ou 8909" lazy-rules
                       mask="####" max-lenght="4"
                       :rules="[val => val && val.length == 3 || val && val.length == 4  || 'Informe os três dígitos do ramal']" />
                   </div>
                   <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                    <q-input v-if="accept" filled type="text" v-model="celular" label="Celular Corporativo" lazy-rules
+                    <q-input v-if="accept" filled bg-color="teal-2" label-color="black" type="text" v-model="celular" label="Celular Corporativo" lazy-rules
                       mask="(##)#####-####" hint="Somente números" max-lenght="14"
                       :rules="[val => val && val !== '' && val.length == 14 || 'Campo Obrigatório']" />
                   </div>
@@ -54,7 +53,10 @@
                   </q-item-section>
                 </q-item>
               </q-list>
-              <q-img :src="url" />
+              <!-- <q-img :src="url" /> -->
+              <!-- <img class="q-img__image q-img__image--with-transition q-img__image--loaded" loading="lazy" fetchpriority="auto" aria-hidden="true" draggable="false" src="../src/assets/tarja.png" style="object-fit: cover; object-position: 50% 50%;"> -->
+              <img src="~assets/tarja.png" class="q-img__image q-img__image--with-transition q-img__image--loaded"
+                   loading="lazy" fetchpriority="auto" aria-hidden="true">
             </q-card-section>
           </div>
         </q-card>
@@ -63,11 +65,19 @@
           <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
         </div>
         <div class="flex justify-center q-mt-lg">
-          <div class="q-pa-md">
-            <q-btn icon="help" label="Tutorial" @click="toggleHelp" color="primary" push class="q-ma-sm" />
-          </div>
+          <q-card class="">
+            <q-card-section class="bg-secondary text-white">
+              <div class="row">
+                <div class="col-12 text-h6">Veja o tutorial abaixo</div>
+              </div>
+                <div class="flex flex-center">
+                  <q-icon name="arrow_downward" size="3em"/>
+              </div>
+              <div class=""></div>
+            </q-card-section>
+          </q-card>
           <div ref="videoContainer">
-            <q-card class="q-mt-lg" v-if="help">
+            <q-card class="q-mt-lg">
               <video controls width="900">
                 <source src="../assets/videos/video.mp4">
               </video>
@@ -80,7 +90,6 @@
       </div>
       <q-separator></q-separator>
     </q-page>
-  </q-layout>
 
 </template>
 
@@ -89,7 +98,6 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { LocalStorage, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import html2canvas from 'html2canvas'
-import { write } from 'clipboard-polyfill'
 
 export default {
 
@@ -120,11 +128,38 @@ export default {
       link.download = filename
       link.click()
     }
-
+    /*
     const copyToClipboard = async (canvas) => {
       try {
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
         await write([new ClipboardItem({ 'image/png': blob })])
+        $q.notify({
+          type: 'positive',
+          message: 'Assinatura Eletrônica copiada para a área de transferência.',
+          timeout: 6000,
+          icon: 'expand_circle_down'
+        })
+        $q.notify({
+          type: 'positive',
+          message: 'Download realizado com sucesso.',
+          timeout: 6000,
+          icon: 'expand_circle_down'
+        })
+      } catch (err) {
+        $q.notify({
+          type: 'negative',
+          timeout: 6000,
+          message: 'Erro ao copiar assinatura. Tente novamente',
+          icon: 'error'
+        })
+      }
+    } */
+    const copyToClipboard = async (canvas) => {
+      try {
+        const blob = canvas.toDataURL('image/png') // Obter data URL da imagem
+        const item = new ClipboardItem({ 'image/png': await fetch(blob).then(res => res.blob()) })
+        await navigator.clipboard.write([item])
+
         $q.notify({
           type: 'positive',
           message: 'Assinatura Eletrônica copiada para a área de transferência.',
@@ -234,5 +269,9 @@ export default {
 
 .info {
   margin-left: -20px
+}
+
+.card {
+  opacity: 0.8;
 }
 </style>

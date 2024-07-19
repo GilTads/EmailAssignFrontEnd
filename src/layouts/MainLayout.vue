@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="gradient-background">
+  <q-layout view="hhh lpR fff">
     <q-header elevated reveal>
       <q-toolbar class="layout-toolbar">
         <div>
@@ -13,9 +13,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
+    <q-page-container class="background-image">
       <router-view />
     </q-page-container>
+    <q-footer flat class="q-pa-none q-mb-none">
+      <q-toolbar class="bg-secondary">
+        <q-toolbar-title class="footer-title" style="color: white;">Developed By TI-SH - Versão {{version }}</q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -24,6 +29,7 @@
 import { onUpdated, ref } from 'vue'
 import { LocalStorage } from 'quasar'
 import { useRouter } from 'vue-router'
+import { version } from '../../package.json'
 
 export default {
 
@@ -38,6 +44,7 @@ export default {
 
     return {
       user,
+      version,
       logoff () {
         LocalStorage.clear()
         router.push({ name: 'login' })
@@ -60,4 +67,20 @@ export default {
   background: #fff;
   color: #006a3e;
 }
+
+.background-image {
+  background: url('../assets/bg.JPG') no-repeat center center;
+  background-size: cover;
+  min-height: 100vh;
+  /* Outros estilos específicos para o background-image */
+}
+
+.footer-title {
+  font-size: 12px;
+  bottom: 1px;
+  right: 10px;
+  text-align: right;
+  color: #006a3e;
+}
+
 </style>
