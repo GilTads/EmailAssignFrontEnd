@@ -22,17 +22,35 @@
           </q-form>
         </q-card-section>
       </q-card>
+      <div class="q-ma-lg flex justify-center">
+        <q-card class="">
+          <q-card-section class="bg-secondary text-white">
+            <div class="row">
+              <div class="col-12 text-h6">Veja o tutorial abaixo</div>
+            </div>
+            <div class="flex flex-center">
+              <q-icon name="arrow_downward" size="3em" />
+            </div>
+          </q-card-section>
+        </q-card>
+        <VideoTutorial />
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import VideoTutorial from '../components/VideoTutorial.vue'
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import Services from '../services'
 import { useRouter } from 'vue-router'
 
 export default {
+  components: {
+    VideoTutorial
+  },
+
   setup () {
     const $q = useQuasar()
     const router = useRouter()

@@ -15,8 +15,13 @@
             <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                  <q-input filled bg-color="teal-2" label-color="black" v-model="ramal" label="Digite seu Ramal" hint="Ex. 501 ou 8909" lazy-rules
-                    mask="####" max-lenght="4"
+                  <q-input filled bg-color="teal-2" label-color="black"
+                    v-model="formattedRamal"
+                    label="Digite seu Ramal"
+                    hint="Ex. 501 ou 8909"
+                    lazy-rules
+                    mask="####"
+                    max-lenght="4"
                     :rules="[val => val && val.length == 3 || val && val.length == 4  || 'Informe os três dígitos do ramal']" />
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
@@ -28,8 +33,13 @@
               <div class="text-h6 flex justify-start">
                 <q-toggle color="secondary" v-model="accept" label="Possui celular corporativo" />
               </div>
-              <div>
-                <q-btn label="Gerar" type="submit" color="secondary" />
+              <div class="row">
+                <div class="col">
+                  <q-btn label="Gerar" type="submit" color="secondary" />
+                </div>
+                <div class="col">
+                  <q-btn icon="help" label="Tutorial" color="secondary" v-model="help" @click="toggleHelp"/>
+                </div>
               </div>
             </q-form>
           </div>
@@ -61,41 +71,26 @@
         <q-btn icon="save" label="Salvar" @click="captureSignature" color="primary" push class="q-ml-sm" />
         <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
       </div>
-      <div class="flex justify-center q-mt-lg">
-        <q-card class="">
-          <q-card-section class="bg-secondary text-white">
-            <div class="row">
-              <div class="col-12 text-h6">Veja o tutorial abaixo</div>
-            </div>
-            <div class="flex flex-center">
-              <q-icon name="arrow_downward" size="3em" />
-            </div>
-            <div class=""></div>
-          </q-card-section>
-        </q-card>
-        <div ref="videoContainer">
-          <q-card class="q-mt-lg">
-            <video controls width="900">
-              <source src="../assets/videos/video.mp4">
-            </video>
-            <q-card-section class="q-mb-lg text-h6 text-secondary flex flex-center">
-              Siga as instruções do vídeo e altere facilmente sua assinatura digital.
-            </q-card-section>
-          </q-card>
+      <q-separator></q-separator>
+        <div class="tutorial" v-if="help" ref="videoContainer">
+          <VideoTutorial />
         </div>
-      </div>
     </div>
-    <q-separator></q-separator>
   </q-page>
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { LocalStorage, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import html2canvas from 'html2canvas'
+import VideoTutorial from 'src/components/VideoTutorial.vue'
 
 export default {
+
+  components: {
+    VideoTutorial
+  },
   setup () {
     const $q = useQuasar()
     const user = ref(null)
@@ -157,6 +152,13 @@ export default {
       }
     }
 
+    const formattedRamal = computed({
+      get: () => ramal.value,
+      set: (newValue) => {
+        ramal.value = newValue.replace(/^0+/, '')
+      }
+    })
+
     const toggleHelp = () => {
       help.value = !help.value
       if (help.value) {
@@ -203,6 +205,7 @@ export default {
       toggleHelp,
       help,
       videoContainer,
+      formattedRamal,
       onSubmit () {
         emailAssignature.value = true
       },
