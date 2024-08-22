@@ -15,6 +15,16 @@
             <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
+                  <q-select
+                    filled bg-color="teal-2" label-color="black"
+                    v-model="selectedPhone"
+                    :options="phoneOptions"
+                    label="Escolha a Unidade"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
                   <q-input filled bg-color="teal-2" label-color="black"
                     v-model="formattedRamal"
                     label="Digite seu Ramal"
@@ -59,7 +69,7 @@
                 <q-item-section v-if="!celular">
                   <span class="name"><b>{{ user.cn }}</b></span>
                   <span class="user-data">{{ user.department }}</span>
-                  <span class="user-data">(67)3441-0500 Ramal {{ ramal }}</span>
+                  <span class="user-data">{{ selectedPhone.value }} Ramal {{ ramal }}</span>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -85,6 +95,7 @@ import { LocalStorage, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import html2canvas from 'html2canvas'
 import VideoTutorial from 'src/components/VideoTutorial.vue'
+import { config } from '../boot/phoneConfig'
 
 export default {
 
@@ -103,6 +114,7 @@ export default {
     const signatureDiv = ref(null)
     const help = ref(false)
     const videoContainer = ref(null)
+    const selectedPhone = ref(null)
 
     const captureSignature = async () => {
       if (signatureDiv.value) {
@@ -151,6 +163,16 @@ export default {
         })
       }
     }
+
+    const phoneOptions = computed(() => {
+      if (config.phones) {
+        return [
+          { label: 'Escritório Corporativo', value: config.phones.corporativo },
+          { label: 'Unidade Industrial', value: config.phones.industrial }
+        ]
+      }
+      return []
+    })
 
     const formattedRamal = computed({
       get: () => ramal.value,
@@ -206,6 +228,8 @@ export default {
       help,
       videoContainer,
       formattedRamal,
+      selectedPhone,
+      phoneOptions,
       onSubmit () {
         emailAssignature.value = true
       },

@@ -4,6 +4,8 @@
       <q-card class="q-mt-lg">
         <video controls poster="../assets/poster.png" width="900">
           <source src="../assets/videos/tutorial.mp4">
+          <source src="../assets/videos/tutorial.webm">
+          Seu navegador não suporta esse vídeo
         </video>
         <q-card-section class="q-mb-lg text-h6 text-secondary flex flex-center">
           Siga as instruções do vídeo e altere facilmente sua assinatura digital.
