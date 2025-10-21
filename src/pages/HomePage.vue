@@ -4,12 +4,14 @@
       <div>
         <h3 class="text-secondary">Olá, <b class="text-primary">{{ user.cn }}</b></h3>
       </div>
+
       <q-card v-if="!emailAssignature" class="card text-primary">
         <q-card-section>
           <div class="text-h5 text-primary flex flex-left">
             Insira as informações abaixo:
           </div>
         </q-card-section>
+
         <q-card-section>
           <div class="q-pa-md">
             <q-form @submit="onSubmit" class="q-gutter-md q-pa-md justify-between">
@@ -19,43 +21,64 @@
                     filled bg-color="teal-2" label-color="black"
                     v-model="selectedPhone"
                     :options="phoneOptions"
+                    option-label="label"
+                    option-value="value"
+                    emit-value
+                    map-options
                     label="Escolha a Unidade"
+                    :rules="[val => !!val || 'Selecione a unidade']"
                   />
                 </div>
               </div>
+
               <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                  <q-input filled bg-color="teal-2" label-color="black"
+                  <q-input
+                    filled bg-color="teal-2" label-color="black"
                     v-model="formattedRamal"
                     label="Digite seu Ramal"
                     hint="Ex. 501 ou 8909"
                     lazy-rules
                     mask="####"
-                    max-lenght="4"
-                    :rules="[val => val && val.length == 3 || val && val.length == 4  || 'Informe os três dígitos do ramal']" />
+                    max-length="4"
+                    :rules="[val => (val && (val.length === 3 || val.length === 4)) || 'Informe os três dígitos do ramal']"
+                  />
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-4 q-ma-sm">
-                  <q-input v-if="accept" filled bg-color="teal-2" label-color="black" type="text" v-model="celular" label="Celular Corporativo" lazy-rules
-                    mask="(##)#####-####" hint="Somente números" max-lenght="14"
-                    :rules="[val => val && val !== '' && val.length == 14 || 'Campo Obrigatório']" />
+                  <q-input
+                    v-if="accept"
+                    filled bg-color="teal-2" label-color="black"
+                    type="text"
+                    v-model="celular"
+                    label="Celular Corporativo"
+                    lazy-rules
+                    mask="(##)#####-####"
+                    hint="Somente números"
+                    max-length="14"
+                    :rules="[val => (val && val.length === 14) || 'Campo Obrigatório']"
+                  />
                 </div>
               </div>
+
               <div class="text-h6 flex justify-start">
                 <q-toggle color="secondary" v-model="accept" label="Possui celular corporativo" />
               </div>
+
               <div class="row">
                 <div class="col">
                   <q-btn label="Gerar" type="submit" color="secondary" />
                 </div>
                 <div class="col">
-                  <q-btn icon="help" label="Tutorial" color="secondary" v-model="help" @click="toggleHelp"/>
+                  <q-btn icon="help" label="Tutorial" color="secondary" v-model="help" @click="toggleHelp" />
                 </div>
               </div>
             </q-form>
           </div>
         </q-card-section>
       </q-card>
+
       <q-separator vertical inset></q-separator>
+
       <q-card v-if="emailAssignature" class="signature-div">
         <div ref="signatureDiv">
           <q-card-section>
@@ -64,12 +87,12 @@
                 <q-item-section v-if="celular">
                   <span class="name"><b>{{ user.cn }}</b></span>
                   <span class="user-data">{{ user.department }}</span>
-                  <span class="user-data">(67)3441-0500 Ramal {{ ramal }} / {{ celular }}</span>
+                  <span class="user-data">{{ selectedPhone }} Ramal {{ ramal }} / {{ celular }}</span>
                 </q-item-section>
-                <q-item-section v-if="!celular">
+                <q-item-section v-else>
                   <span class="name"><b>{{ user.cn }}</b></span>
                   <span class="user-data">{{ user.department }}</span>
-                  <span class="user-data">{{ selectedPhone.value }} Ramal {{ ramal }}</span>
+                  <span class="user-data">{{ selectedPhone }} Ramal {{ ramal }}</span>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -77,14 +100,17 @@
           </q-card-section>
         </div>
       </q-card>
+
       <div class="q-mt-md" v-if="emailAssignature">
         <q-btn icon="save" label="Salvar" @click="captureSignature" color="primary" push class="q-ml-sm" />
         <q-btn icon="arrow_back" label="Voltar" @click="voltar()" color="secondary" push class="q-ml-sm" />
       </div>
+
       <q-separator></q-separator>
-        <div class="tutorial" v-if="help" ref="videoContainer">
-          <VideoTutorial />
-        </div>
+
+      <div class="tutorial" v-if="help" ref="videoContainer">
+        <VideoTutorial />
+      </div>
     </div>
   </q-page>
 </template>
@@ -95,13 +121,10 @@ import { LocalStorage, useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import html2canvas from 'html2canvas'
 import VideoTutorial from 'src/components/VideoTutorial.vue'
-import { config } from '../boot/phoneConfig'
+import { config } from 'src/boot/phoneConfig'
 
 export default {
-
-  components: {
-    VideoTutorial
-  },
+  components: { VideoTutorial },
   setup () {
     const $q = useQuasar()
     const user = ref(null)
@@ -129,6 +152,7 @@ export default {
         copyToClipboard(canvas)
       }
     }
+
     const downloadImage = (data, filename) => {
       const link = document.createElement('a')
       link.href = data
@@ -141,34 +165,19 @@ export default {
         const blob = canvas.toDataURL('image/png')
         const item = new ClipboardItem({ 'image/png': await fetch(blob).then(res => res.blob()) })
         await navigator.clipboard.write([item])
-
-        $q.notify({
-          type: 'positive',
-          message: 'Assinatura Eletrônica copiada para a área de transferência.',
-          timeout: 6000,
-          icon: 'expand_circle_down'
-        })
-        $q.notify({
-          type: 'positive',
-          message: 'Download realizado com sucesso.',
-          timeout: 6000,
-          icon: 'expand_circle_down'
-        })
+        $q.notify({ type: 'positive', message: 'Assinatura Eletrônica copiada para a área de transferência.', timeout: 6000, icon: 'expand_circle_down' })
+        $q.notify({ type: 'positive', message: 'Download realizado com sucesso.', timeout: 6000, icon: 'expand_circle_down' })
       } catch (err) {
-        $q.notify({
-          type: 'negative',
-          timeout: 6000,
-          message: 'Erro ao copiar assinatura. Tente novamente',
-          icon: 'error'
-        })
+        $q.notify({ type: 'negative', timeout: 6000, message: 'Erro ao copiar assinatura. Tente novamente', icon: 'error' })
       }
     }
 
     const phoneOptions = computed(() => {
       if (config.phones) {
         return [
-          { label: 'Escritório Corporativo', value: config.phones.corporativo },
-          { label: 'Unidade Industrial', value: config.phones.industrial }
+          { label: 'Escritório Corporativo - (67)3312-8900', value: config.phones.corporativo },
+          { label: 'Unidade Industrial - (67)3441-0500', value: config.phones.industrial },
+          { label: 'Prédio Automotivo - (67)2071-0400', value: config.phones.automotiva }
         ]
       }
       return []
@@ -177,7 +186,7 @@ export default {
     const formattedRamal = computed({
       get: () => ramal.value,
       set: (newValue) => {
-        ramal.value = newValue.replace(/^0+/, '')
+        ramal.value = (newValue || '').replace(/^0+/, '')
       }
     })
 
@@ -211,6 +220,7 @@ export default {
         router.push({ name: 'login' })
       }
     })
+
     onUnmounted(() => {
       LocalStorage.clear()
     })
@@ -244,7 +254,6 @@ export default {
 </script>
 
 <style>
-
 @font-face {
   font-family: arial-unicode-ms;
   src: url('../assets/font/arial-unicode-ms.ttf');
